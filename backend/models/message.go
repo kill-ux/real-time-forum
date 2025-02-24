@@ -16,6 +16,7 @@ type Message struct {
 	Content    string `json:"content"`
 	CreatedAt  int    `json:"created_at"`
 	IsRead     bool   `json:"is_read"`
+	Typing     bool   `json:"typing"`
 }
 
 type WSMessage struct {
