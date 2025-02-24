@@ -87,6 +87,8 @@ func handleMessage(msg models.WSMessage, conn *websocket.Conn) {
 			return
 		}
 		conn.WriteJSON(msg)
+	case "typing":
+		distributeMessage(msg)
 	}
 }
 
