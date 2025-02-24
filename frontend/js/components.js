@@ -177,7 +177,6 @@ export const renderUsers = (users) => {
                 </div>
                 <div class="chat-body">
                 </div>
-                <div class="typing">${user.nickname} is typing</div>
                 </div>
                 <div class="chat-footer">
                     <form class="chat-form" onsubmit="return false">
@@ -185,6 +184,7 @@ export const renderUsers = (users) => {
                             <textarea id="chat" rows="1" class="message-input chat-input" data-userId="${user.id}" placeholder="Your message..."></textarea>
                         </div>
                     </form>
+                    <div class="typing"><div class="loader"></div><strong>${user.nickname}</strong> is typing...</div>
                 </div>
             `
             element.querySelector(".unread").style.display = "none"

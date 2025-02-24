@@ -13,12 +13,31 @@
     /* height: 20px; */
     padding: 5px;
     display: inline-block;
-    /* opacity: 0; */
+    font-size: 0.8rem;
+    opacity: 0;
 }
+
+/* Add the "is typing" text before the element */
+  
+ /* HTML: <div class="loader"></div> */
+ .typing .loader {
+    display: inline-block;
+    margin-inline: 15px;
+    width: 7px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    animation: l5 1s infinite linear alternate;
+  }
+  @keyframes l5 {
+      0%  {box-shadow: 10px 0 #fff, -10px 0 #fff2;background: #fff }
+      33% {box-shadow: 10px 0 #fff, -10px 0 #fff2;background: #fff2}
+      66% {box-shadow: 10px 0 #fff2,-10px 0 #fff; background: #fff2}
+      100%{box-shadow: 10px 0 #fff2,-10px 0 #fff; background: #fff }
+  }
 
 /* HTML: <div class="loader"></div> */
 /* HTML: <div class="loader"></div> */
-.typing::before {
+/* .typing::before {
     content: "";
     display: inline-block;
     width: 60px;
@@ -27,7 +46,7 @@
     clip-path: inset(0 100% 0 0);
     animation: l1 1s steps(4) infinite;
   }
-  @keyframes l1 {to{clip-path: inset(0 -34% 0 0)}}
+  @keyframes l1 {to{clip-path: inset(0 -34% 0 0)}} */
 
 .profile-container {
     position: relative;
@@ -855,7 +874,7 @@ li:hover {
     /*  filter: blur(1px); */
     /* background-color: white; */
     /* display: grid; */
-    grid-template-rows: 1fr 10fr 0.4fr 1fr;
+    grid-template-rows: 1fr 10fr 1fr;
     height: 100vh;
 }
 
@@ -919,6 +938,7 @@ li:hover {
     display: flex;
     align-items: center;
     padding: 0.75rem;
+    padding-bottom: 0;
     /* border-radius: 0.5rem; */
     height: 100%;
     /* background-color: #f9fafb; Light mode background */

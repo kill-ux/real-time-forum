@@ -35,6 +35,13 @@ class WebWorkerClient {
             case 'read':
                 document.querySelector(`.user-detail[data-userId="${data.message.receiver_id}"] .unread`).style.display = "none";
                 break
+            case 'typing':
+                if (data.is_typing){
+                    document.querySelector(`.typing`).style.opacity = "1";
+                }else{
+                    document.querySelector(`.typing`).style.opacity = "0";
+                }
+                break
             case 'new_message':
                 console.log("data => ", data)
                 this.PreRenderUsers(data);

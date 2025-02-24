@@ -40,10 +40,11 @@ export class ChatManager {
             if (e.key != 'Enter') {
                 if (this.isTyping) {
                     socket.sendMessage({
-                        type: "typing", message: {
-                            receiver_id: this.receiverUser.id,
-                            is_typing: this.isTyping
-                        }
+                        type: "typing",
+                        message: {
+                            receiver_id: this.receiverUser.id
+                        },
+                        is_typing: this.isTyping
                     });
                     console.log("typing => false")
                     this.isTyping = false
