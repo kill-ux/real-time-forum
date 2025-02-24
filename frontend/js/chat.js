@@ -11,6 +11,7 @@ export class ChatManager {
         this.setupEventListeners();
         this.loadMessages();
         this.timer
+
     }
 
     setupEventListeners() {
@@ -30,6 +31,13 @@ export class ChatManager {
                             created_at: new Date().getTime()
                         }
                     });
+                    socket.sendMessage({
+                        type: "typing", message: {
+                            receiver_id: this.receiverUser.id
+                        },
+                        is_typing: false
+                    });
+                    this.isTyping = true
                 }
 
             }
@@ -48,23 +56,46 @@ export class ChatManager {
                     });
                     console.log("typing => false")
                     this.isTyping = false
+                    clearTimeout(this.timer)
+                    this.timer = setTimeout(() => {
+                        socket.sendMessage({
+                            type: "typing", message: {
+                                receiver_id: this.receiverUser.id
+                            },
+                            is_typing: false
+                        });
+                        console.log("typing => true")
+                        this.isTyping = true
+                    }, 1000)
 
                 } else {
                     clearTimeout(this.timer)
                     this.timer = setTimeout(() => {
                         socket.sendMessage({
                             type: "typing", message: {
-                                receiver_id: this.receiverUser.id,
-                                is_typing: this.isTyping
-                            }
+                                receiver_id: this.receiverUser.id
+                            },
+                            is_typing: false
                         });
                         console.log("typing => true")
                         this.isTyping = true
-                    }, 2000)
+                    }, 1000)
                 }
 
             }
         });
+
+        this.messageInput.addEventListener("blur", () => {
+            setTimeout(() => {
+                socket.sendMessage({
+                    type: "typing", message: {
+                        receiver_id: this.receiverUser.id
+                    },
+                    is_typing: false
+                });
+            }, 1000)
+
+        })
 
 
         this.chatMessages.addEventListener('scroll', Utils.opThrottle(() => {

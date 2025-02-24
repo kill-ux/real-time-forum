@@ -188,7 +188,14 @@ export const renderUsers = (users) => {
                 </div>
             `
             element.querySelector(".unread").style.display = "none"
+            
             ChatUI = new ChatManager(user)
+
+            if (element.dataset.typing === "true"){
+                document.querySelector(`.typing`).style.opacity = "1";
+            }else{
+                document.querySelector(`.typing`).style.opacity = "0";
+            }
             socket.markRead(user.id)
         })
     });

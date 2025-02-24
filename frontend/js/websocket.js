@@ -1,4 +1,6 @@
+import { userInfo } from "./auth.js";
 import { ChatUI, renderUsers } from "./components.js";
+
 class WebWorkerClient {
     constructor() {
     }
@@ -35,12 +37,21 @@ class WebWorkerClient {
             case 'read':
                 document.querySelector(`.user-detail[data-userId="${data.message.receiver_id}"] .unread`).style.display = "none";
                 break
+            case 'ping':
+                this.worker.port.postMessage({type:"pong"})
+                break
             case 'typing':
-                if (data.is_typing){
-                    document.querySelector(`.typing`).style.opacity = "1";
-                }else{
-                    document.querySelector(`.typing`).style.opacity = "0";
+
+                document.querySelector(`.user-detail[data-userid="${data.message.sender_id}"]`).dataset.typing = data.is_typing
+                //userInfo.id !== data.message.sender_id && userInfo.id === data.message.receiver_id && 
+                if (data.message.sender_id == ChatUI?.receiverUser.id) {
+                    if (data.is_typing) {
+                        document.querySelector(`.typing`).style.opacity = "1";
+                    } else {
+                        document.querySelector(`.typing`).style.opacity = "0";
+                    }
                 }
+
                 break
             case 'new_message':
                 console.log("data => ", data)
