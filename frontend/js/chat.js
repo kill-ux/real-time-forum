@@ -4,11 +4,13 @@ import Utils from "./utils.js";
 
 export class ChatManager {
     constructor(receiverUser) {
+        this.isTyping = true
         this.receiverUser = receiverUser;
         this.messageInput = document.querySelector('.chat-input');
         this.chatMessages = document.querySelector('.chat-body');
         this.setupEventListeners();
         this.loadMessages();
+        this.timer
     }
 
     setupEventListeners() {
@@ -33,6 +35,37 @@ export class ChatManager {
             }
         });
 
+        this.messageInput.addEventListener('keypress', e => {
+            // Check if the pressed key is NOT a modifier key
+            if (e.key != 'Enter') {
+                if (this.isTyping) {
+                    socket.sendMessage({
+                        type: "typing", message: {
+                            receiver_id: this.receiverUser.id,
+                            is_typing: this.isTyping
+                        }
+                    });
+                    console.log("typing => false")
+                    this.isTyping = false
+
+                } else {
+                    clearTimeout(this.timer)
+                    this.timer = setTimeout(() => {
+                        socket.sendMessage({
+                            type: "typing", message: {
+                                receiver_id: this.receiverUser.id,
+                                is_typing: this.isTyping
+                            }
+                        });
+                        console.log("typing => true")
+                        this.isTyping = true
+                    }, 2000)
+                }
+
+            }
+        });
+
+
         this.chatMessages.addEventListener('scroll', Utils.opThrottle(() => {
             if (this.chatMessages.scrollTop <= 50) {
                 this.loadMessages();
@@ -54,7 +87,7 @@ export class ChatManager {
         const messages = await response.json();
         let oldHeight = this.chatMessages.scrollHeight;
         messages?.forEach((msg) => {
-                this.addMessage(msg, true)
+            this.addMessage(msg, true)
         });
 
         this.chatMessages.scrollTop = this.chatMessages.scrollHeight - oldHeight;

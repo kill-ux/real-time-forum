@@ -128,7 +128,13 @@ export const renderHome = () => {
         }
     }, 200));
 
-
+    document.querySelectorAll(".nav-items li").forEach((item)=>{
+        console.log(item)
+        item.addEventListener("click",()=>{
+            console.log("happen ")
+            ChatUI = null
+        })
+    })
 }
 
 export let ChatUI
@@ -149,6 +155,7 @@ export const renderUsers = (users) => {
         
     `
     const chatMain = document.querySelector(".chat-main")
+
     usersAside.childNodes.forEach(element => {
         element.addEventListener("click", () => {
 
@@ -169,8 +176,8 @@ export const renderUsers = (users) => {
                     </div>
                 </div>
                 <div class="chat-body">
-               
                 </div>
+                <div class="typing">${user.nickname} is typing</div>
                 </div>
                 <div class="chat-footer">
                     <form class="chat-form" onsubmit="return false">
