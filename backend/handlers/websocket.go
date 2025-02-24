@@ -90,6 +90,7 @@ func handleMessage(msg models.WSMessage, conn *websocket.Conn) {
 	case "typing":
 		distributeMessage(msg)
 	}
+	
 }
 
 func distributeMessage(msg models.WSMessage) {
