@@ -23,7 +23,7 @@ type WSMessage struct {
 	Data    interface{} `json:"data"`
 	Message `json:"message"`
 	Members []Members `json:"members"`
-	Typing  bool      `json:"typing"`
+	Typing  bool      `json:"is_typing"`
 }
 
 func GetMessageHistory(sender, receiver, time int) (messages []Message, err error) {
