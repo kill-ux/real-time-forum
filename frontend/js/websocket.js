@@ -34,7 +34,6 @@ class WebWorkerClient {
                 this.PreRenderUsers(data);
                 break;
             case 'status_update':
-                console.log(data)
                 this.PreRenderUsers(data);
                 break;
             case 'read':
@@ -67,7 +66,6 @@ class WebWorkerClient {
 
                 break
             case 'new_message':
-                console.log("data => ", data)
                 this.PreRenderUsers(data);
                 if (ChatUI?.receiverUser.id === data.message.sender_id || ChatUI?.receiverUser.id === data.message.receiver_id) {
                     ChatUI.addMessage(data.message, false, true);

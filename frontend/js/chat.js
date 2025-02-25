@@ -55,21 +55,20 @@ export class ChatManager {
                         is_typing: this.isTyping
                     });
                     
-                    console.log("typing => false")
                     this.isTyping = false
-                    clearTimeout(this.timer)
-                    this.timer = setTimeout(() => {
-                        socket.sendMessage({
-                            type: "typing", message: {
-                                receiver_id: this.receiverUser.id
-                            },
-                            is_typing: false
-                        });
-                        console.log("typing => true")
-                        this.isTyping = true
-                    }, 1000)
+                    // clearTimeout(this.timer)
+                    // this.timer = setTimeout(() => {
+                    //     socket.sendMessage({
+                    //         type: "typing", message: {
+                    //             receiver_id: this.receiverUser.id
+                    //         },
+                    //         is_typing: false
+                    //     });
+                    //     this.isTyping = true
+                    // }, 1000)
 
-                } else {
+                } 
+                //else {
                     clearTimeout(this.timer)
                     this.timer = setTimeout(() => {
                         socket.sendMessage({
@@ -78,10 +77,9 @@ export class ChatManager {
                             },
                             is_typing: false
                         });
-                        console.log("typing => true")
                         this.isTyping = true
                     }, 1000)
-                }
+                //}
 
             }
         });

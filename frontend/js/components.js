@@ -129,9 +129,7 @@ export const renderHome = () => {
     }, 200));
 
     document.querySelectorAll(".nav-items li").forEach((item)=>{
-        console.log(item)
         item.addEventListener("click",()=>{
-            console.log("happen ")
             ChatUI = null
         })
     })
@@ -181,7 +179,7 @@ export const renderUsers = (users) => {
                 <div class="chat-footer">
                     <form class="chat-form" onsubmit="return false">
                         <div class="message-container">
-                            <textarea id="chat" rows="1" class="message-input chat-input" data-userId="${user.id}" placeholder="Your message..." maxlength="1000"></textarea>
+                            <textarea id="chat" rows="1" class="message-input chat-input" data-userId="${user.id}" placeholder="Your message..." maxlength="250"></textarea>
                         </div>
                     </form>
                     <div class="typing u${userId}"><div class="loader"></div><strong>${user.nickname}</strong> is typing...</div>

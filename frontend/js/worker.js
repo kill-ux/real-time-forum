@@ -2,11 +2,11 @@
 
 let socket = null;
 const ports = new Set(); // Store all connected tabs
-const lastPong = new WeakMap(); // Track last pong time per port
+const lastPong = new Map(); // Track last pong time per port
 
 // Heartbeat configuration
-const PING_INTERVAL = 1000; // Send ping every 5 seconds
-const PONG_TIMEOUT = 2000; // Consider port closed if no pong in 10 seconds
+const PING_INTERVAL = 5000; // Send ping every 5 seconds
+const PONG_TIMEOUT = 10000; // Consider port closed if no pong in 10 seconds
 
 // Function to ping all ports and check for timeouts
 function pingPorts() {
@@ -18,18 +18,11 @@ function pingPorts() {
             if (last && now - last > PONG_TIMEOUT) {
                 console.log('Port timed out, removing it');
                 ports.delete(port);
-                // socket.sendMessage({
-                //     type: "typing", message: {
-                //         receiver_id: this.receiverUser.id
-                //     },
-                //     is_typing: false
-                // });
                 if (ports.size === 0 && socket) {
                     socket.close();
                     socket = null;
                     console.log('WebSocket closed due to no active ports');
                 }
-
             }
         } catch (e) {
             console.error('Error pinging port:', e);
@@ -48,6 +41,7 @@ pingPorts();
 
 // Handle new connections from tabs
 self.onconnect = (event) => {
+    console.log(event)
     const port = event.ports[0];
     ports.add(port);
     lastPong.set(port, Date.now()); // Initialize last pong time

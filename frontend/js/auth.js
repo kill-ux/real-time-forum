@@ -16,7 +16,6 @@ export let userInfo
 const renderTemplate = (html) => {
     const container = document.getElementById("authContainer")
     container.innerHTML = html;
-console.log("renderTemplate", container)
     if (html) {
         container.style.display = "flex"
     } else {
@@ -26,7 +25,6 @@ console.log("renderTemplate", container)
 
 
 export const renderAuthForms = () => {
-    console.log("renderAuthForms")
     renderTemplate(/*html */`
         <div class="log">
         <div>
@@ -128,7 +126,6 @@ export const renderAuthForms = () => {
 }
 
 const validateInput = (id, pattern) => {
-    console.log("validateInput", id)
     const input = document.getElementById(id)
     const value = input.value.trim();
     if (!value || !pattern.test(value)) {
