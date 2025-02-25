@@ -7,10 +7,18 @@ import (
 
 func ServeFilesHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := os.ReadFile("../frontend" + r.URL.Path)
-	if err != nil && r.URL.Path != "/" {
+	if err != nil {
+		file, err := os.ReadFile("../frontend/index.html")
+		if err != nil {
+			http.Error(w, "File not found", http.StatusNotFound)
+			return
+		}
+		// serve file with header
 		w.WriteHeader(http.StatusNotFound)
-		http.ServeFile(w, r, "../frontend/index.html")
+		w.Header().Set("Content-Type", "text/html")
+		w.Write(file)
 		return
 	}
+
 	http.FileServer(http.Dir("../frontend")).ServeHTTP(w, r)
 }
