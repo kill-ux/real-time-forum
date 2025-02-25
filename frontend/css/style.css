@@ -16,6 +16,14 @@
     font-size: 0.8rem;
     opacity: 0;
 }
+.Error404{
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 /* Add the "is typing" text before the element */
   

@@ -43,7 +43,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       headers: { "Content-Type": "application/json" }
     });
   };
+  const notFound = new Promise((resolve)=>{
+    if (window.location.pathname === "/"){
+      resolve("")
+    }else{
+      const closeBtn = document.createElement("button")
+      closeBtn.textContent = "continue"
+      closeBtn.onclick = ()=>resolve("")
+      container.innerHTML = /*html*/ `
+      <div class="Error404"><div class="innerDiv"><p> 404 not Found </p></div></div>
+      `
+      document.querySelector(".innerDiv").append(closeBtn)
+    }
 
+  })
+  await notFound
   await checkUserLogin()
 
   if (isLoggedin) {
