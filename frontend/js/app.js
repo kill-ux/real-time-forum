@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         Utils.notice("Too Many Requests, slow down!")
       } else if (response.status == 401) {
         domLogout()
+      }else if (response.status == 500) {
+        Utils.notice("something went wrong")
       }
 
       // For non-429 responses, return original response
