@@ -11,7 +11,6 @@ export class ChatManager {
         this.setupEventListeners();
         this.loadMessages();
         this.timer
-
     }
 
     setupEventListeners() {
@@ -73,15 +72,12 @@ export class ChatManager {
         });
 
         this.messageInput.addEventListener("blur", () => {
-            setTimeout(() => {
                 socket.sendMessage({
                     type: "typing", message: {
                         receiver_id: this.receiverUser.id
                     },
                     is_typing: false
                 });
-            }, 1000)
-
         })
 
 
