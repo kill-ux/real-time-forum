@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// Initialize database
-	if err := db.InitDB("../database/forum.db"); err != nil {
+	if err := db.InitDB("../database/forum.db?_foreign_keys=1"); err != nil {
 		log.Fatal("Database initialization failed:", err)
 	}
 	// to close db when panic
