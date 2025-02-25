@@ -57,17 +57,25 @@ func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func ErrorMessage(senderID int, conn *websocket.Conn) {
+	conn.WriteJSON(models.WSMessage{
+		Type: "error",
+	})
+}
+
 func handleMessage(msg models.WSMessage, conn *websocket.Conn) {
 	var err error
 	switch msg.Type {
 	case "new_message":
 		msg.Message.Content = strings.TrimSpace(msg.Message.Content)
-		if len(msg.Message.Content) == 0 || len(msg.Message.Content) > 2000 {
+		if len(msg.Message.Content) == 0 || len(msg.Message.Content) > 500 {
+			ErrorMessage(msg.SenderID, conn)
 			return
 		}
 
 		if err := msg.Message.StoreMessage(); err != nil {
 			fmt.Println("Message Store Error:", err)
+			ErrorMessage(msg.SenderID, conn)
 			return
 		}
 
@@ -90,7 +98,6 @@ func handleMessage(msg models.WSMessage, conn *websocket.Conn) {
 	case "typing":
 		distributeMessage(msg)
 	}
-	
 }
 
 func distributeMessage(msg models.WSMessage) {
