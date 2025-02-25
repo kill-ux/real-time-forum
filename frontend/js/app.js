@@ -49,9 +49,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }else{
       const closeBtn = document.createElement("button")
       closeBtn.textContent = "continue"
-      closeBtn.onclick = ()=>resolve("")
+      closeBtn.onclick = ()=>{
+        history.replaceState(null, "", "/");
+        resolve("")
+      }
       container.innerHTML = /*html*/ `
-      <div class="Error404"><div class="innerDiv"><p> 404 not Found </p></div></div>
+      <div class="Error404"><div class="innerDiv"><h1> 404 not Found </h1></div></div>
       `
       document.querySelector(".innerDiv").append(closeBtn)
     }

@@ -54,6 +54,7 @@ export class ChatManager {
                         },
                         is_typing: this.isTyping
                     });
+                    
                     console.log("typing => false")
                     this.isTyping = false
                     clearTimeout(this.timer)

@@ -16,7 +16,8 @@
     font-size: 0.8rem;
     opacity: 0;
 }
-.Error404{
+
+.Error404 {
     position: absolute;
     height: 100vh;
     width: 100vw;
@@ -25,23 +26,51 @@
     align-items: center;
 }
 
+.Error404 div {
+    text-align: center;
+}
+.Error404 button{
+    font-weight: bolder;
+    color: white;
+    background-color: black;
+    border:1px white solid;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
 /* Add the "is typing" text before the element */
-  
- /* HTML: <div class="loader"></div> */
- .typing .loader {
+
+/* HTML: <div class="loader"></div> */
+.typing .loader {
     display: inline-block;
     margin-inline: 15px;
     width: 7px;
     aspect-ratio: 1;
     border-radius: 50%;
     animation: l5 1s infinite linear alternate;
-  }
-  @keyframes l5 {
-      0%  {box-shadow: 10px 0 #fff, -10px 0 #fff2;background: #fff }
-      33% {box-shadow: 10px 0 #fff, -10px 0 #fff2;background: #fff2}
-      66% {box-shadow: 10px 0 #fff2,-10px 0 #fff; background: #fff2}
-      100%{box-shadow: 10px 0 #fff2,-10px 0 #fff; background: #fff }
-  }
+}
+
+@keyframes l5 {
+    0% {
+        box-shadow: 10px 0 #fff, -10px 0 #fff2;
+        background: #fff
+    }
+
+    33% {
+        box-shadow: 10px 0 #fff, -10px 0 #fff2;
+        background: #fff2
+    }
+
+    66% {
+        box-shadow: 10px 0 #fff2, -10px 0 #fff;
+        background: #fff2
+    }
+
+    100% {
+        box-shadow: 10px 0 #fff2, -10px 0 #fff;
+        background: #fff
+    }
+}
 
 /* HTML: <div class="loader"></div> */
 /* HTML: <div class="loader"></div> */

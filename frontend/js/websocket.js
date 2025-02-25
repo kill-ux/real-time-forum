@@ -1,5 +1,6 @@
 import { userInfo } from "./auth.js";
 import { ChatUI, renderUsers } from "./components.js";
+import Utils from "./utils.js";
 
 class WebWorkerClient {
     constructor() {
@@ -9,6 +10,8 @@ class WebWorkerClient {
         this.worker.port.start()
         this.worker.port.postMessage({ type: "connect" })
         this.setupEventListeners();
+        this.opacity
+        this.timer
     }
 
     setupEventListeners = () => {
@@ -37,19 +40,29 @@ class WebWorkerClient {
             case 'read':
                 document.querySelector(`.user-detail[data-userId="${data.message.receiver_id}"] .unread`).style.display = "none";
                 break
+            case 'error':
+                Utils.notice("message was not sent, try again!")
+                break
             case 'ping':
-                this.worker.port.postMessage({type:"pong"})
+                this.worker.port.postMessage({ type: "pong" })
                 break
             case 'typing':
 
-                document.querySelector(`.user-detail[data-userid="${data.message.sender_id}"]`).dataset.typing = data.is_typing
+                const user = document.querySelector(`.user-detail[data-userid="${data.message.sender_id}"]`)
+                if (user) {
+                    user.dataset.typing = data.is_typing
+                }
                 //userInfo.id !== data.message.sender_id && userInfo.id === data.message.receiver_id && 
                 if (data.message.sender_id == ChatUI?.receiverUser.id) {
                     if (data.is_typing) {
-                        document.querySelector(`.typing`).style.opacity = "1";
+                        this.opacity = "1";
                     } else {
-                        document.querySelector(`.typing`).style.opacity = "0";
+                        this.opacity = "0";
                     }
+                    clearTimeout(this.timer)
+                    this.timer = setTimeout(() =>
+                        document.querySelector(`.typing.u${data.message.sender_id}`).style.opacity = this.opacity
+                        , 300)
                 }
 
                 break
