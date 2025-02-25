@@ -54,32 +54,20 @@ export class ChatManager {
                         },
                         is_typing: this.isTyping
                     });
-                    
-                    this.isTyping = false
-                    // clearTimeout(this.timer)
-                    // this.timer = setTimeout(() => {
-                    //     socket.sendMessage({
-                    //         type: "typing", message: {
-                    //             receiver_id: this.receiverUser.id
-                    //         },
-                    //         is_typing: false
-                    //     });
-                    //     this.isTyping = true
-                    // }, 1000)
 
-                } 
-                //else {
-                    clearTimeout(this.timer)
-                    this.timer = setTimeout(() => {
-                        socket.sendMessage({
-                            type: "typing", message: {
-                                receiver_id: this.receiverUser.id
-                            },
-                            is_typing: false
-                        });
-                        this.isTyping = true
-                    }, 1000)
-                //}
+                    this.isTyping = false
+                }
+
+                clearTimeout(this.timer)
+                this.timer = setTimeout(() => {
+                    socket.sendMessage({
+                        type: "typing", message: {
+                            receiver_id: this.receiverUser.id
+                        },
+                        is_typing: false
+                    });
+                    this.isTyping = true
+                }, 1000)
 
             }
         });

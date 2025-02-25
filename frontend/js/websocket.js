@@ -92,7 +92,7 @@ class WebWorkerClient {
     }
 
     close = () => {
-        this.worker.port.postMessage({ type: "close" })
+        this.worker?.port.postMessage({ type: "close" })
     }
 
 

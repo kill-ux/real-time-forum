@@ -3,7 +3,10 @@ import { container, socket } from "./app.js";
 import { renderHome } from "./components.js";
 import { addPost, getposts } from "./posts.js";
 import Utils from "./utils.js";
+
 export let isLoggedin = false
+export let userInfo
+
 const patterns = {
     nickname: /^[a-zA-Z0-9_-]{3,40}$/,
     email: /^[a-zA-Z0-9._+-]{3,20}@[a-zA-Z0-9.-]{3,20}\.[a-zA-Z]{2,10}$/,
@@ -12,7 +15,7 @@ const patterns = {
     lastName: /^[A-Za-z]{3,40}$/,
     gender: /^(male|female)$/,
 };
-export let userInfo
+
 const renderTemplate = (html) => {
     const container = document.getElementById("authContainer")
     container.innerHTML = html;
@@ -22,7 +25,6 @@ const renderTemplate = (html) => {
         container.style.display = "none"
     }
 }
-
 
 export const renderAuthForms = () => {
     renderTemplate(/*html */`
