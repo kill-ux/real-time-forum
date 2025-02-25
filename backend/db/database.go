@@ -17,11 +17,14 @@ func InitDB(filepath string) error {
 		return err
 	}
 	DB.SetMaxOpenConns(10)
-	return nil
+	return DB.Ping()
 }
 
 func RunMigrations() error {
-	data, _ := os.ReadFile("db/migrations.sql")
-	_, err := DB.Exec(string(data))
+	data, err := os.ReadFile("db/migrations.sql")
+	if err != nil {
+		return err
+	}
+	_, err = DB.Exec(string(data))
 	return err
 }
