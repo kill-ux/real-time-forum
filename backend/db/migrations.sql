@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     `image` TEXT
 );
 
+
 -- Posts with categories
 CREATE TABLE IF NOT EXISTS `posts` (
     `id` INTEGER PRIMARY KEY AUTOINCREMENT,
