@@ -67,7 +67,6 @@ class Utils {
         }
         if (response.ok) {
             const likeData = await response.json()
-            console.log(postFooters)
             postFooters.forEach((postFooter) => {
                 const [likeBtn, likeCount, dislikeBtn, dislikeCount] = postFooter.children
                 likeCount.textContent = likeData.likes

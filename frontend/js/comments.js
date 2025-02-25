@@ -49,7 +49,6 @@ export const getComments = async (post_id, before) => {
 
 
 export const addComment = async (e) => {
-    console.log("comment added maybe ?")
     e.preventDefault()
     const input = e.target.querySelector(".comment-input")
     const content = input.value

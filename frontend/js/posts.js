@@ -57,17 +57,17 @@ export const addPost = async (e) => {
     const categories = formData.getAll("categories");
     const image = formData.get("image");
     if (!title || title.length < 3 || title.length > 100) {
-        alert("Title must be between 3 and 100 characters.");
+        Utils.notice("Title must be between 3 and 100 characters.");
         return;
     }
 
     if (!content || content.length < 10 || content.length > 2000) {
-        alert("Content must be between 10 and 2000 characters.");
+        Utils.notice("Content must be between 10 and 2000 characters.");
         return;
     }
     if (image.size > 0 && image.name !== "") {
         if (image.size > 1024 * 1024) { // 1 MB
-            alert("Image size must be less than 1 MB.");
+            Utils.notice("Image size must be less than 1 MB.");
             return;
         }
 
@@ -75,7 +75,7 @@ export const addPost = async (e) => {
         const imageExtension = image.name.split('.').pop().toLowerCase();
 
         if (!allowedExtensions.includes(imageExtension)) {
-            alert("Invalid image extension. Allowed extensions are: " + allowedExtensions.join(", "));
+            Utils.notice("Invalid image extension. Allowed extensions are: " + allowedExtensions.join(", "));
             return;
         }
     }
@@ -83,7 +83,7 @@ export const addPost = async (e) => {
     const allowedCategories = ["tech", "programming", "health", "finance", "food", "science", "memes", "others"];
     for (let category of categories) {
         if (!allowedCategories.includes(category)) {
-            alert("Invalid category: " + category + ". Allowed categories are: " + allowedCategories.join(", "));
+            Utils.notice("Invalid category: " + category + ". Allowed categories are: " + allowedCategories.join(", "));
             return;
         }
     }
@@ -145,8 +145,6 @@ const addPostEvents = (post, postElm) => {
         addCommentsElement(post.id, allComments)
         commentsContainer.addEventListener("scroll", Utils.opThrottle((e) => {
             if (e.target.scrollTop + e.target.clientHeight >= e.target.scrollHeight-50) {
-                console.log("test")
-
                 addCommentsElement(post.id, allComments)
             }
         },1000))

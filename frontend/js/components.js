@@ -129,9 +129,7 @@ export const renderHome = () => {
     }, 200));
 
     document.querySelectorAll(".nav-items li").forEach((item)=>{
-        console.log(item)
         item.addEventListener("click",()=>{
-            console.log("happen ")
             ChatUI = null
         })
     })
