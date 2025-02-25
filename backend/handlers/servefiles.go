@@ -10,7 +10,7 @@ func ServeFilesHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		file, err := os.ReadFile("../frontend/index.html")
 		if err != nil {
-			http.Error(w, "File not found", http.StatusNotFound)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 		// serve file with header
