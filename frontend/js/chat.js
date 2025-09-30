@@ -19,6 +19,7 @@ export class ChatManager {
                 return;
             }
             if (e.key === 'Enter') {
+                e.preventDefault()
                 const value = this.messageInput.value.trim();
                 this.messageInput.value = ""
 
@@ -72,12 +73,12 @@ export class ChatManager {
         });
 
         this.messageInput.addEventListener("blur", () => {
-                socket.sendMessage({
-                    type: "typing", message: {
-                        receiver_id: this.receiverUser.id
-                    },
-                    is_typing: false
-                });
+            socket.sendMessage({
+                type: "typing", message: {
+                    receiver_id: this.receiverUser.id
+                },
+                is_typing: false
+            });
         })
 
 
