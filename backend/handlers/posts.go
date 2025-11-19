@@ -12,30 +12,34 @@ import (
 	"forum/utils/middlewares"
 )
 
+// CreatePostHandler handles post creation requests
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	var post models.Post
 
+	// Validate post data from form
 	if err := post.BeforCreatePost(r); err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest)
 		return
 	}
 
+	// Validate and filter categories
 	newCats := isValidCategory(r.Form["categories"])
 	post.Categories = strings.Join(newCats, ", ")
 
-	// Process image if exists
+	// Handle optional image upload
 	file, fileheader, err := r.FormFile("image")
-	// var image string
 	if err == nil {
 		post.Image = models.HandleImage("posts", file, fileheader)
 	}
 
+	// Get authenticated user from context
 	user, ok := r.Context().Value(middlewares.UserIDKey).(models.User)
 	if !ok {
 		utils.RespondWithError(w, http.StatusUnauthorized)
 		return
 	}
 
+	// Set post metadata and insert into database
 	post.UserID = user.ID
 	post.CreatedAt = int(time.Now().Unix())
 	result, err := db.DB.Exec(`INSERT INTO posts 
@@ -44,12 +48,15 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithError(w, http.StatusInternalServerError)
 		return
 	}
+	
+	// Get the newly created post ID
 	post.ID, err = result.LastInsertId()
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError)
 		return
 	}
 
+	// Return post with user information
 	post_user := models.PostWithUser{
 		Post: post,
 		User: user,
@@ -57,16 +64,19 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusCreated, post_user)
 }
 
+// GetPostsHandler retrieves paginated posts with user and like information
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var before struct {
 		Before int `json:"before"`
 	}
 
+	// Parse pagination parameter
 	err := utils.ParseBody(r, &before)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest)
 	}
 
+	// Query posts with user information, ordered by creation time
 	rows, err := db.DB.Query(`
         SELECT p.*,u.id ,u.first_name,u.last_name,u.nickname,u.image
         FROM posts p
@@ -81,6 +91,7 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
+	// Build posts array with likes information
 	var posts []models.PostWithUser
 	for rows.Next() {
 		var post models.PostWithUser
@@ -89,6 +100,8 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 			utils.RespondWithError(w, http.StatusInternalServerError)
 			return
 		}
+		
+		// Fetch likes for each post
 		post.P_ID = &post.ID
 		post.NameID = "post_id"
 		post.GetLikes, err = GetLikes(w, r, post.GetLikes)
@@ -98,19 +111,15 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 		posts = append(posts, post)
 	}
 
-	// var likes models.GetLikes
-	// likes.P_ID = like.P_ID
-	// likes.NameID = like.NameID
-
-	// utils.RespondWithJSON(w, http.StatusCreated, likes)
-
 	utils.RespondWithJSON(w, http.StatusOK, posts)
 }
 
+// getValidCategories returns the list of allowed post categories
 func getValidCategories() []string {
 	return []string{"tech", "programming", "health", "finance", "food", "science", "memes", "others"}
 }
 
+// isValidCategory filters user-provided categories against valid ones
 func isValidCategory(categories []string) (newCats []string) {
 	validCategories := getValidCategories()
 	for _, validCat := range validCategories {
@@ -120,6 +129,7 @@ func isValidCategory(categories []string) (newCats []string) {
 			}
 		}
 	}
+	// Default to "others" if no valid categories provided
 	if len(newCats) == 0 {
 		newCats = append(newCats, "others")
 	}

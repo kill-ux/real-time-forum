@@ -7,6 +7,7 @@ import (
 	"reflect"
 )
 
+// RespondWithJSON sends a JSON response with the specified status code
 func RespondWithJSON(w http.ResponseWriter, status int, payload ...interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -18,6 +19,7 @@ func RespondWithJSON(w http.ResponseWriter, status int, payload ...interface{}) 
 	}
 }
 
+// RespondWithError sends a JSON error response
 func RespondWithError(w http.ResponseWriter, code int, msg ...string) {
 	if len(msg) > 0 {
 		RespondWithJSON(w, code, map[string]any{"message": msg[0]})
@@ -26,32 +28,32 @@ func RespondWithError(w http.ResponseWriter, code int, msg ...string) {
 	}
 }
 
+// ParseBody decodes JSON request body into the provided interface
 func ParseBody(r *http.Request, v interface{}) error {
 	defer r.Body.Close()
 	return json.NewDecoder(r.Body).Decode(v)
 }
 
-// GetScanFields returns a slice of pointers to struct fields for scanning SQL results.
-// Pass a pointer to the struct. 
-// Example: GetScanFields(&user) => []*interface{}{&user.ID, &user.FirstName, &user.LastName, &user.Nickname, &user.Image}
+// GetScanFields returns pointers to struct fields for SQL scanning
+// Example: GetScanFields(&user) => []*interface{}{&user.ID, &user.FirstName, ...}
 func GetScanFields(s interface{}) []interface{} {
 	val := reflect.ValueOf(s)
 	if val.Kind() != reflect.Ptr || val.Elem().Kind() != reflect.Struct {
 		log.Fatal("Input must be a pointer to a struct")
 	}
-	val = val.Elem() // like &user => user
+	val = val.Elem()
 
-	fields := make([]interface{}, val.NumField()) // like user => user.ID, user.FirstName, ...
+	fields := make([]interface{}, val.NumField())
 	for i := 0; i < val.NumField(); i++ {
 		fields[i] = val.Field(i).Addr().Interface()
 	}
 	return fields
 }
 
-// GetExecFields returns a slice of struct field values, excluding specified fields.
-// Example: GetExecFields(user, "ID", "CreatedAt") => []interface{}{user.FirstName, user.LastName, user.Nickname, user.Image}
+// GetExecFields returns struct field values, excluding specified fields
+// Example: GetExecFields(user, "ID", "CreatedAt") => []interface{}{user.FirstName, user.LastName, ...}
 func GetExecFields(s interface{}, excludeFields ...string) []interface{} {
-	val := reflect.ValueOf(s) // like user => user.FirstName, user.LastName, ...
+	val := reflect.ValueOf(s)
 	if val.Kind() == reflect.Ptr {
 		val = val.Elem()
 	}
@@ -59,12 +61,13 @@ func GetExecFields(s interface{}, excludeFields ...string) []interface{} {
 		log.Fatal("Input must be a struct or pointer to a struct")
 	}
 
-	// Convert excluded fields to a map for fast lookup
+	// Create map of excluded fields for fast lookup
 	excluded := make(map[string]bool)
 	for _, field := range excludeFields {
 		excluded[field] = true
 	}
 
+	// Collect non-excluded field values
 	var fields []interface{}
 	for i := 0; i < val.NumField(); i++ {
 		fieldName := val.Type().Field(i).Name
