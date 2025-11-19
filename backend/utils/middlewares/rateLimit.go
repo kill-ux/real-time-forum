@@ -16,6 +16,8 @@ type RateLimiter struct {
 }
 
 // NewRateLimiter creates a new RateLimiter instance.
+// NewRateLimiter creates a new RateLimiter instance with default settings.
+// It initializes the rate limiter with a visitor map for tracking request counts.
 func NewRateLimiter() *RateLimiter {
 	return &RateLimiter{
 		clients: map[string]time.Time{},
@@ -54,6 +56,9 @@ func (rl *RateLimiter) CleanupOldEntries() {
 }
 
 // RateLimitMiddleware is the HTTP middleware for rate limiting.
+// RateLimitMiddleware is the HTTP middleware for rate limiting.
+// It limits requests per IP address to prevent abuse and ensure fair usage.
+// Returns 429 Too Many Requests when the limit is exceeded.
 func RateLimit(rl *RateLimiter, next http.Handler) http.Handler {
 	return ErrorHandler(LoggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Get the client's IP address

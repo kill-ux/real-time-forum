@@ -45,6 +45,9 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// ForbidnMiddleware prevents authenticated users from accessing login/registration pages.
+// It checks if a user is already logged in and returns 403 Forbidden if they are.
+// This middleware is used on auth-related routes to redirect logged-in users.
 func ForbidnMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("uuid")

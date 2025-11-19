@@ -7,6 +7,9 @@ import (
 	"reflect"
 )
 
+// RespondWithJSON sends a JSON response with the specified HTTP status code.
+// It accepts an optional payload that will be encoded as JSON in the response body.
+// If encoding fails, it returns a 500 Internal Server Error.
 func RespondWithJSON(w http.ResponseWriter, status int, payload ...interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -18,6 +21,9 @@ func RespondWithJSON(w http.ResponseWriter, status int, payload ...interface{}) 
 	}
 }
 
+// RespondWithError sends a JSON error response with the specified HTTP status code.
+// It accepts an optional custom error message, defaulting to a generic message if none provided.
+// The response format is {"message": "error text"}.
 func RespondWithError(w http.ResponseWriter, code int, msg ...string) {
 	if len(msg) > 0 {
 		RespondWithJSON(w, code, map[string]any{"message": msg[0]})
@@ -26,14 +32,18 @@ func RespondWithError(w http.ResponseWriter, code int, msg ...string) {
 	}
 }
 
+// ParseBody decodes the JSON request body into the provided interface.
+// It automatically closes the request body after reading.
+// Returns an error if the JSON is malformed or cannot be decoded.
 func ParseBody(r *http.Request, v interface{}) error {
 	defer r.Body.Close()
 	return json.NewDecoder(r.Body).Decode(v)
 }
 
 // GetScanFields returns a slice of pointers to struct fields for scanning SQL results.
-// Pass a pointer to the struct. 
-// Example: GetScanFields(&user) => []*interface{}{&user.ID, &user.FirstName, &user.LastName, &user.Nickname, &user.Image}
+// It uses reflection to iterate through all struct fields and return their addresses.
+// Pass a pointer to the struct.
+// Example: GetScanFields(&user) => []interface{}{&user.ID, &user.FirstName, &user.LastName, ...}
 func GetScanFields(s interface{}) []interface{} {
 	val := reflect.ValueOf(s)
 	if val.Kind() != reflect.Ptr || val.Elem().Kind() != reflect.Struct {
@@ -49,7 +59,9 @@ func GetScanFields(s interface{}) []interface{} {
 }
 
 // GetExecFields returns a slice of struct field values, excluding specified fields.
-// Example: GetExecFields(user, "ID", "CreatedAt") => []interface{}{user.FirstName, user.LastName, user.Nickname, user.Image}
+// It uses reflection to extract field values, useful for SQL INSERT/UPDATE operations.
+// Excluded fields are typically auto-generated (ID, timestamps) or should not be modified.
+// Example: GetExecFields(user, "ID", "CreatedAt") => []interface{}{user.FirstName, user.LastName, ...}
 func GetExecFields(s interface{}, excludeFields ...string) []interface{} {
 	val := reflect.ValueOf(s) // like user => user.FirstName, user.LastName, ...
 	if val.Kind() == reflect.Ptr {

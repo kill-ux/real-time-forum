@@ -5,6 +5,9 @@ import (
 	"os"
 )
 
+// ServeFilesHandler serves static files from the frontend directory.
+// If a file is not found, it serves the index.html for client-side routing (SPA support).
+// Returns the requested file or index.html with a 404 status if the original file doesn't exist.
 func ServeFilesHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := os.ReadFile("../frontend" + r.URL.Path)
 	if err != nil {

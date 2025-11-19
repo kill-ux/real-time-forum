@@ -21,6 +21,9 @@ var (
 	clientsMu sync.RWMutex
 )
 
+// WebSocketHandler upgrades HTTP connections to WebSocket and manages real-time messaging.
+// It handles client registration, message routing, and broadcasts user status updates.
+// The connection is maintained until the client disconnects or an error occurs.
 func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -57,12 +60,17 @@ func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ErrorMessage sends an error message to a WebSocket client.
+// It's used to notify clients when their message couldn't be processed.
 func ErrorMessage(senderID int, conn *websocket.Conn) {
 	conn.WriteJSON(models.WSMessage{
 		Type: "error",
 	})
 }
 
+// handleMessage processes incoming WebSocket messages based on their type.
+// Supported types: "new_message" (chat), "read" (mark as read), "users" (get user list), "typing" (typing indicator).
+// It validates message content and routes them to appropriate handlers.
 func handleMessage(msg models.WSMessage, conn *websocket.Conn) {
 	var err error
 	switch msg.Type {
@@ -100,6 +108,8 @@ func handleMessage(msg models.WSMessage, conn *websocket.Conn) {
 	}
 }
 
+// distributeMessage sends a message to both sender and receiver if they're connected.
+// It updates the user list and member information for each recipient.
 func distributeMessage(msg models.WSMessage) {
 	var err error
 	clientsMu.RLock()
@@ -120,6 +130,8 @@ func distributeMessage(msg models.WSMessage) {
 	}
 }
 
+// broadcastUserStatus sends the current list of online users to all connected clients.
+// It's called when users connect or disconnect to keep all clients synchronized.
 func broadcastUserStatus() {
 	var err error
 	clientsMu.RLock()
@@ -142,6 +154,8 @@ func broadcastUserStatus() {
 	}
 }
 
+// removeClient removes a user from the active clients map and closes their connection.
+// It also broadcasts the updated user status to all remaining clients.
 func removeClient(userID int) {
 	clientsMu.Lock()
 	if conn, ok := clients[userID]; ok {
@@ -153,6 +167,8 @@ func removeClient(userID int) {
 	broadcastUserStatus()
 }
 
+// getClientIDs returns a slice of all currently connected user IDs.
+// This is used to inform clients about who is online.
 func getClientIDs() []int {
 	keys := make([]int, 0, len(clients))
 	for key := range clients {

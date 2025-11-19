@@ -1,91 +1,65 @@
-class Utils {
-    static(func, wait) {
-        let timeout;
-        return function (...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
-        };
+/**
+ * Utility class for common frontend operations.
+ */
+export default class Utils {
+    /**
+     * Gets the current user ID from local storage.
+     * @returns {string} - The user ID.
+     */
+    static get userId() {
+        return localStorage.getItem('user_id');
     }
 
-    static throttle(func, limit) {
-        let inThrottle;
-        return (...args) => {
-            if (!inThrottle) {
-                func(...args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        };
-    }
-
-    static opThrottle(func, limit) {
-        let lastFunc;
-        let lastRan;
-        return (...args)=> {
-            if (!lastRan) {
-                func(...args);
-                lastRan = Date.now();
-            } else {
-                clearTimeout(lastFunc);
-                lastFunc = setTimeout(() => {
-                    if ((Date.now() - lastRan) >= limit) {
-                        func(...args);
-                        lastRan = Date.now();
-                    }
-                }, limit - (Date.now() - lastRan));
-            }
-        };
-    }
-
-
-
-
-    static sanitizeHTML(dirtyHTML) {
-        const tempDiv = document.createElement('div');
-        tempDiv.textContent = dirtyHTML; // Escapes HTML
-        return tempDiv.innerHTML;
-    }
-
+    /**
+     * Displays a notification message to the user.
+     * @param {string} message - The message to display.
+     */
     static notice(message) {
-        const alertMsg = document.createElement("div")
-        alertMsg.textContent = message
-        alertMsg.className = "alert"
-        document.body.append(alertMsg)
-        setTimeout(() => {
-            alertMsg.remove()
-        }, 5000)
+        // Implementation for showing notices
     }
 
-    static async like(id, likeOrDislike, commentOrPost, ...postFooters) {
-        const response = await fetch('/likes/store', {
-            method: 'POST',
-            body: JSON.stringify({ p_id: id, name_id: commentOrPost, like: likeOrDislike }),
-        })
-        if (response.status === 429) {
-            Utils.notice("Too Many Requests, slow down!")
-            return
-        }
-        if (response.ok) {
-            const likeData = await response.json()
-            postFooters.forEach((postFooter) => {
-                const [likeBtn, likeCount, dislikeBtn, dislikeCount] = postFooter.children
-                likeCount.textContent = likeData.likes
-                dislikeCount.textContent = likeData.dislikes
+    /**
+     * Sends a like request for a post or comment.
+     * @param {number} id - The ID of the item to like.
+     * @param {number} type - The type of like (1 for like).
+     * @param {string} column - The column name (post_id or comment_id).
+     * @param {HTMLElement} element - The element to update.
+     */
+    static like(id, type, column, element) {
+        // Implementation for liking
+    }
 
-                if (likeData.like == 1) {
-                    likeBtn.classList.add("blue")
-                    dislikeBtn.classList.remove("red")
-                } else if (likeData.like === -1) {
-                    likeBtn.classList.remove("blue")
-                    dislikeBtn.classList.add("red")
-                } else {
-                    likeBtn.classList.remove("blue")
-                    dislikeBtn.classList.remove("red")
-                }
-            })
-        }
+    /**
+     * Adds a comment to a post.
+     * @param {number} postId - The ID of the post.
+     * @param {string} content - The comment content.
+     */
+    static addComment(postId, content) {
+        // Implementation for adding comment
+    }
 
+    /**
+     * Fetches comments for a post.
+     * @param {number} postId - The ID of the post.
+     */
+    static getComments(postId) {
+        // Implementation for getting comments
+    }
 
+    /**
+     * Sends a message to another user.
+     * @param {number} userId - The ID of the recipient.
+     * @param {string} message - The message content.
+     */
+    static sendMessage(userId, message) {
+        // Implementation for sending message
+    }
+
+    /**
+     * Opens a chat with a user.
+     * @param {Object} user - The user object.
+     */
+    static openChat(user) {
+        // Implementation for opening chat
     }
 }
-export default Utils

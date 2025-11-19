@@ -12,6 +12,9 @@ import (
 	"forum/utils/middlewares"
 )
 
+// CreateCommentHandler handles the creation of new comments on posts.
+// It validates comment data, associates it with the authenticated user, and stores it in the database.
+// Returns 201 with the created comment on success, or appropriate error codes on failure.
 func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	var comment models.CommentWithUser
 
@@ -58,6 +61,9 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusCreated, comment)
 }
 
+// GetCommentsHandler retrieves paginated comments for a specific post.
+// It fetches comments created before a specified timestamp, including user and like information.
+// Returns 200 with an array of comments (max 10) or 500 on database errors.
 func GetCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	var data struct {
 		Post_id int `json:"post_id"`

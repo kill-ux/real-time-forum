@@ -28,6 +28,8 @@ type PostWithUser struct {
 	User User `json:"user"`
 }
 
+// length checks if a string's length is outside the specified range [a, b].
+// Returns true if the string is too short or too long, false if within range.
 func length(a, b int, e string) bool {
 	return len(e) < a || len(e) > b
 }
@@ -44,7 +46,10 @@ func (post *Post) BeforCreatePost(r *http.Request) error {
 
 const maxFileSize = 1000000 // 1MB file size limit
 
-// Helper function to handle image uploads
+// HandleImage processes and saves uploaded image files.
+// It validates file size (max 1MB), checks file extension, generates a unique filename,
+// and saves the file to the specified path in the frontend assets directory.
+// Returns the generated filename with extension, or empty string if validation fails.
 func HandleImage(path string, file multipart.File, fileheader *multipart.FileHeader) string {
 	if fileheader.Size > maxFileSize {
 		return ""

@@ -12,6 +12,9 @@ import (
 	"forum/utils/middlewares"
 )
 
+// GetMessageHistoryHandler retrieves the message history between the authenticated user and another user.
+// It fetches messages created before a specified timestamp for pagination.
+// Returns 200 with an array of messages on success, or appropriate error codes on failure.
 func GetMessageHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value(middlewares.UserIDKey).(models.User)
 	if !ok {
@@ -41,6 +44,9 @@ func GetMessageHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusOK, messages)
 }
 
+// GetUsers retrieves a list of all users except the specified user, with messaging metadata.
+// It includes last message time and unread message count for each user.
+// Returns a slice of Members or an error if the query fails.
 func GetUsers(userID int) (users []models.Members, err error) {
 	query := `
         SELECT 

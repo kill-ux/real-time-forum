@@ -12,6 +12,9 @@ import (
 	"forum/utils/middlewares"
 )
 
+// CreatePostHandler handles the creation of new posts.
+// It validates post data, processes image uploads, and stores the post in the database.
+// Returns 201 with the created post on success, or appropriate error codes on failure.
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	var post models.Post
 
@@ -57,6 +60,9 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusCreated, post_user)
 }
 
+// GetPostsHandler retrieves a paginated list of posts.
+// It fetches posts created before a specified timestamp, including user and like information.
+// Returns 200 with an array of posts (max 10) or 500 on database errors.
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var before struct {
 		Before int `json:"before"`
@@ -107,10 +113,14 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusOK, posts)
 }
 
+// getValidCategories returns the list of valid post categories.
+// These categories are used to validate and filter user-submitted post categories.
 func getValidCategories() []string {
 	return []string{"tech", "programming", "health", "finance", "food", "science", "memes", "others"}
 }
 
+// isValidCategory validates and filters post categories.
+// It returns only valid categories from the input, defaulting to "others" if none are valid.
 func isValidCategory(categories []string) (newCats []string) {
 	validCategories := getValidCategories()
 	for _, validCat := range validCategories {

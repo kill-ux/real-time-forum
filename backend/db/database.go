@@ -10,6 +10,9 @@ import (
 
 var DB *sql.DB
 
+// InitDB initializes the database connection and sets up the SQLite database.
+// It opens a connection to the specified database file and stores it in the global DB variable.
+// Returns an error if the database cannot be opened or initialized.
 func InitDB(filepath string) error {
 	var err error
 	DB, err = sql.Open("sqlite3", filepath)

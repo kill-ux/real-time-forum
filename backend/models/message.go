@@ -26,6 +26,9 @@ type WSMessage struct {
 	Typing  bool      `json:"is_typing"`
 }
 
+// GetMessageHistory retrieves the message history between two users.
+// It fetches up to 10 messages created before the specified timestamp, ordered by creation time.
+// Returns a slice of messages or an error if the query fails.
 func GetMessageHistory(sender, receiver, time int) (messages []Message, err error) {
 	rows, err := db.DB.Query(`
 	    SELECT * FROM messages
@@ -51,12 +54,18 @@ func GetMessageHistory(sender, receiver, time int) (messages []Message, err erro
 	return
 }
 
+// StoreMessage inserts a new message into the database.
+// It excludes the auto-generated ID field from the insert operation.
+// Returns an error if the database operation fails.
 func (message *Message) StoreMessage() error {
 	// message.CreatedAt = int(time.Now().Unix())
 	_, err := db.DB.Exec("INSERT INTO messages VALUES(NULL ,?,?,?,?,?)", utils.GetExecFields(message, "ID")...)
 	return err
 }
 
+// UpdateRead marks all unread messages from a specific sender to a receiver as read.
+// This is called when a user views their conversation with another user.
+// Returns an error if the database operation fails.
 func (message *Message) UpdateRead() error {
 	_, err := db.DB.Exec("UPDATE messages SET is_read = true WHERE sender_id = ? AND receiver_id = ? AND is_read = false", message.ReceiverID, message.SenderID)
 	return err

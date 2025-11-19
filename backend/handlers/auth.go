@@ -13,6 +13,9 @@ import (
 	"github.com/gofrs/uuid/v5"
 )
 
+// RegisterHandler handles user registration requests.
+// It validates user input, hashes the password, and creates a new user account.
+// Returns 201 on success, 400 for invalid data, or 500 for server errors.
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 
@@ -41,6 +44,9 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Handle response
 }
 
+// LoginHandler handles user login requests.
+// It verifies credentials, generates a session UUID, and sets a cookie.
+// Returns 200 with user data on success, or 400 for invalid credentials.
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	err := utils.ParseBody(r, &user)
@@ -87,6 +93,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Handle response
 }
 
+// LogoutHandler handles user logout requests.
+// It invalidates the user's session and clears the authentication cookie.
+// Returns 204 on success or 401 if unauthorized.
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value(middlewares.UserIDKey).(models.User)
 	if !ok {
@@ -106,7 +115,9 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusNoContent)
 }
 
-// handlers/auth.go
+// CheckAuthHandler verifies if a user is authenticated.
+// It checks the session cookie and returns user information if valid.
+// Returns 200 with user data on success, or 401 if unauthorized.
 func CheckAuthHandler(w http.ResponseWriter, r *http.Request) {
 	// Get session ID from cookie
 	cookie, err := r.Cookie("uuid")

@@ -12,6 +12,9 @@ import (
 	"forum/utils/middlewares"
 )
 
+// CreateLikesHandler handles like/dislike actions on posts or comments.
+// It creates, updates, or removes likes based on the user's previous action.
+// Returns 201 with updated like counts on success, or appropriate error codes on failure.
 func CreateLikesHandler(w http.ResponseWriter, r *http.Request) {
 	var like models.Likes
 
@@ -93,6 +96,9 @@ func CreateLikesHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusCreated, likes)
 }
 
+// GetLikesHandler retrieves like/dislike counts and the current user's like status.
+// It works for both posts and comments based on the provided ID.
+// Returns 200 with like data on success, or 400/401 on errors.
 func GetLikesHandler(w http.ResponseWriter, r *http.Request) {
 	var likes models.GetLikes
 	err := utils.ParseBody(r, &likes)
@@ -107,6 +113,9 @@ func GetLikesHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusOK, likes)
 }
 
+// GetLikes is a helper function that fetches like/dislike counts and user's like status.
+// It queries the database for total likes, dislikes, and the authenticated user's vote.
+// Returns the populated GetLikes struct or an error if the operation fails.
 func GetLikes(w http.ResponseWriter, r *http.Request, likes models.GetLikes) (models.GetLikes, error) {
 	user, ok := r.Context().Value(middlewares.UserIDKey).(models.User)
 	if !ok {

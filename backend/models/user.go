@@ -30,6 +30,10 @@ type User struct {
 	Image     string `json:"image"`
 }
 
+// BeforeCreate validates and prepares user data before creating a new user account.
+// It trims whitespace, validates all fields against regex patterns, hashes the password,
+// and sets the user's profile image based on their first name initial.
+// Returns an error if any validation fails.
 func (u *User) BeforeCreate() error {
 	u.CreatedAt = time.Now().Unix()
 
@@ -67,29 +71,43 @@ func (u *User) BeforeCreate() error {
 	return nil
 }
 
+// VerifyPassword checks if the provided password matches the user's hashed password.
+// It validates the password format and uses bcrypt for secure comparison.
+// Returns true if the password is valid, false otherwise.
 func (u *User) VerifyPassword(password string) bool {
 	passPattern := regexp.MustCompile(`^.{8,100}$`)
 	return passPattern.MatchString(u.Password) && bcrypt.CompareHashAndPassword([]byte(password), []byte(u.Password)) == nil
 }
 
+// CreateUser inserts a new user record into the database.
+// It excludes auto-generated fields (ID, UUID, UUID_EXP, LastSeen) from the insert.
+// Returns an error if the database operation fails.
 func (user *User) CreateUser() error {
 	// hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	_, err := db.DB.Exec(`INSERT INTO users VALUES (NULL,NULL,0,?,?,?,?,?,?,?,?,0,?)`, utils.GetExecFields(user, "ID", "UUID", "UUID_EXP", "LastSeen")...)
 	return err
 }
 
+// UpdateUuid updates the user's session UUID and expiration time in the database.
+// This is called during login to establish a new session.
+// Returns an error if the database operation fails.
 func (user *User) UpdateUuid() error {
 	// hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	_, err := db.DB.Exec(`UPDATE users SET uuid = ? , uuid_exp = ? WHERE id = ?`, user.UUID, user.UUID_EXP, user.ID)
 	return err
 }
 
+// Logout invalidates a user's session by clearing their UUID and expiration time.
+// This effectively logs the user out by removing their authentication token.
+// Returns an error if the database operation fails.
 func Logout(id int) error {
 	_, err := db.DB.Exec(`UPDATE users SET uuid = NULL , uuid_exp = 0 WHERE id = ?`, id)
 	return err
 }
 
-// SQL Injection Prevention
+// GetUserBy retrieves a user by their email or nickname with SQL injection prevention.
+// It validates the input against strict regex patterns before querying the database.
+// Returns a pointer to the User or an error if not found or validation fails.
 func GetUserBy(id string) (*User, error) {
 	id = strings.TrimSpace(strings.ToLower(id))
 	nicknamePattern := regexp.MustCompile(`^[a-zA-Z0-9_-]{3,40}$`)

@@ -18,7 +18,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Save the original fetch function
   const originalFetch = window.fetch;
 
-  // Override global fetch
+  /**
+   * Overrides the global fetch function to handle rate limiting, unauthorized access, and server errors.
+   * @param {...any} args - Arguments passed to the original fetch function.
+   * @returns {Promise<Response>} - The response from the fetch call or a dummy error response.
+   */
   window.fetch = async function (...args) {
 
     try {
