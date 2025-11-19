@@ -1,5 +1,6 @@
 package models
 
+// Members represents user information for chat member lists
 type Members struct {
 	ID              int    `json:"id"`
 	Nickname        string `json:"nickname"`
@@ -7,6 +8,6 @@ type Members struct {
 	LastName        string `json:"lastname"`
 	LastSeen        int64  `json:"last_seen"`
 	Image           string `json:"image"`
-	LastMessageTime string `json:"last_message_time"`
-	UnreadCount     int    `json:"unread_count"`
+	LastMessageTime string `json:"last_message_time"` // Timestamp of last message exchanged
+	UnreadCount     int    `json:"unread_count"`      // Number of unread messages from this user
 }

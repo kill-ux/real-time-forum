@@ -12,13 +12,17 @@ import (
 	"forum/utils/middlewares"
 )
 
+// GetMessageHistoryHandler retrieves paginated message history between two users
 func GetMessageHistoryHandler(w http.ResponseWriter, r *http.Request) {
+	// Get authenticated user from context
 	user, ok := r.Context().Value(middlewares.UserIDKey).(models.User)
 	if !ok {
 		utils.RespondWithError(w, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
 	userID := user.ID
+	
+	// Parse receiver ID and pagination parameter
 	var receiver_id struct {
 		ReceiverID int `json:"receiver_id"`
 		Before     int `json:"before"`
@@ -29,10 +33,14 @@ func GetMessageHistoryHandler(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
+	
+	// Validate pagination parameter
 	if receiver_id.Before == 0 {
 		utils.RespondWithError(w, http.StatusBadRequest, "Invalid request")
 		return
 	}
+	
+	// Fetch message history
 	messages, err := models.GetMessageHistory(userID, receiver_id.ReceiverID, receiver_id.Before)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusUnauthorized)
@@ -41,7 +49,9 @@ func GetMessageHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusOK, messages)
 }
 
+// GetUsers retrieves all users with their last message time and unread count for the current user
 func GetUsers(userID int) (users []models.Members, err error) {
+	// Query users with message metadata sorted by last message time
 	query := `
         SELECT 
 			u.id, 
@@ -73,7 +83,7 @@ func GetUsers(userID int) (users []models.Members, err error) {
 	}
 	defer rows.Close()
 
-	// var users []models.Members
+	// Build users array
 	for rows.Next() {
 		var user models.Members
 		if err = rows.Scan(utils.GetScanFields(&user)...); err != nil {

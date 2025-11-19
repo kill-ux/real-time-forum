@@ -12,12 +12,14 @@ import (
 	"forum/utils/middlewares"
 )
 
+// main initializes the database, sets up routes, and starts the HTTP server
 func main() {
-	// Initialize database
+	// Initialize database connection with foreign keys enabled
 	if err := db.InitDB("../database/forum.db?_foreign_keys=1"); err != nil {
 		log.Fatal("Database initialization failed:", err)
 	}
-	// to close db when panic
+	
+	// Close database connection on panic
 	defer func() {
 		if err := recover(); err != nil {
 			db.DB.Close()
@@ -25,7 +27,7 @@ func main() {
 		}
 	}()
 
-	// to close db when ctrl+c
+	// Handle graceful shutdown on Ctrl+C
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
@@ -35,18 +37,18 @@ func main() {
 		os.Exit(0)
 	}()
 
-	// Apply migrations
+	// Run database migrations
 	if err := db.RunMigrations(); err != nil {
 		panic("Migrations failed:" + err.Error())
 	}
 
-	// Create a rate limiter
+	// Initialize rate limiter
 	rl := middlewares.NewRateLimiter()
 
-	// Start a goroutine to clean up old entries every second
+	// Start background goroutine to clean up old rate limiter entries
 	go rl.CleanupOldEntries()
 
-	// Configure routes
+	// Register API routes with middleware
 	http.Handle("/check-auth", middlewares.RateLimit(rl, http.HandlerFunc(handlers.CheckAuthHandler)))
 	http.Handle("/register", middlewares.RateLimit(rl, middlewares.ForbidnMiddleware(http.HandlerFunc(handlers.RegisterHandler))))
 	http.Handle("/login", middlewares.RateLimit(rl, middlewares.ForbidnMiddleware(http.HandlerFunc(handlers.LoginHandler))))
@@ -60,10 +62,10 @@ func main() {
 	http.Handle("/messages", middlewares.RateLimit(rl, middlewares.AuthMiddleware(http.HandlerFunc(handlers.GetMessageHistoryHandler))))
 	http.Handle("/ws", middlewares.RateLimit(rl, middlewares.AuthMiddleware(http.HandlerFunc(handlers.WebSocketHandler))))
 
-	// Configure routes
+	// Serve static files and SPA
 	http.Handle("/", http.HandlerFunc(handlers.ServeFilesHandler))
 
-	// Start server
+	// Start HTTP server
 	log.Println("Server starting on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic("Server failed to start:" + err.Error())

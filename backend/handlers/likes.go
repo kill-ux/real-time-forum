@@ -12,9 +12,11 @@ import (
 	"forum/utils/middlewares"
 )
 
+// CreateLikesHandler handles like/dislike creation, update, and removal
 func CreateLikesHandler(w http.ResponseWriter, r *http.Request) {
 	var like models.Likes
 
+	// Parse like data from request body
 	err := utils.ParseBody(r, &like)
 	if err != nil {
 		log.Println("Failed to parse request body:", err)
@@ -22,12 +24,14 @@ func CreateLikesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validate like data
 	if err := like.BeforCreateLikes(); err != nil {
 		log.Println("Validation error:", err)
 		utils.RespondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
+	// Get authenticated user from context
 	user, ok := r.Context().Value(middlewares.UserIDKey).(models.User)
 	if !ok {
 		utils.RespondWithError(w, http.StatusUnauthorized, "Unauthorized")
@@ -35,6 +39,7 @@ func CreateLikesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	like.UserID = user.ID
 
+	// Determine content ID (post or comment)
 	var contentID int64
 	if like.C_ID != nil {
 		contentID = *like.C_ID
@@ -45,6 +50,7 @@ func CreateLikesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if user already liked/disliked this content
 	var existingLike int
 	query := "SELECT like FROM likes WHERE " + like.NameID + " = ? AND user_id = ?"
 	row := db.DB.QueryRow(query, contentID, user.ID)
@@ -61,10 +67,10 @@ func CreateLikesHandler(w http.ResponseWriter, r *http.Request) {
 		result, err = db.DB.Exec(`INSERT INTO likes (user_id, `+like.NameID+`, like) VALUES (?, ?, ?)`, user.ID, contentID, like.Like)
 	} else {
 		if existingLike == like.Like {
-			// Remove like/dislike if it's the same as the existing one
+			// Remove like/dislike if clicking the same button again
 			result, err = db.DB.Exec(`DELETE FROM likes WHERE user_id = ? AND `+like.NameID+` = ?`, user.ID, contentID)
 		} else {
-			// Update like/dislike
+			// Update like to dislike or vice versa
 			result, err = db.DB.Exec(`UPDATE likes SET like = ? WHERE user_id = ? AND `+like.NameID+` = ?`, like.Like, user.ID, contentID)
 		}
 	}
@@ -82,6 +88,7 @@ func CreateLikesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Return updated like counts
 	var likes models.GetLikes
 	likes.C_ID = like.C_ID
 	likes.P_ID = like.P_ID
@@ -93,13 +100,18 @@ func CreateLikesHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusCreated, likes)
 }
 
+// GetLikesHandler retrieves like/dislike counts for a post or comment
 func GetLikesHandler(w http.ResponseWriter, r *http.Request) {
 	var likes models.GetLikes
+	
+	// Parse and validate request
 	err := utils.ParseBody(r, &likes)
 	if err != nil || (likes.NameID != "comment_id" && likes.NameID != "post_id") || (likes.P_ID != nil && likes.C_ID != nil) {
 		utils.RespondWithError(w, http.StatusBadRequest, "Invalid request")
 		return
 	}
+	
+	// Fetch like counts
 	likes, err = GetLikes(w, r, likes)
 	if err != nil {
 		return
@@ -107,7 +119,9 @@ func GetLikesHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusOK, likes)
 }
 
+// GetLikes retrieves like/dislike counts and user's like status for a post or comment
 func GetLikes(w http.ResponseWriter, r *http.Request, likes models.GetLikes) (models.GetLikes, error) {
+	// Get authenticated user from context
 	user, ok := r.Context().Value(middlewares.UserIDKey).(models.User)
 	if !ok {
 		utils.RespondWithError(w, http.StatusUnauthorized, "Unauthorized")
@@ -115,6 +129,7 @@ func GetLikes(w http.ResponseWriter, r *http.Request, likes models.GetLikes) (mo
 	}
 	userID := user.ID
 
+	// Determine content ID (post or comment)
 	var contentID int64
 	if likes.C_ID != nil {
 		contentID = *likes.C_ID
@@ -125,6 +140,7 @@ func GetLikes(w http.ResponseWriter, r *http.Request, likes models.GetLikes) (mo
 		return models.GetLikes{}, errors.New("unth")
 	}
 
+	// Query like counts and user's like status
 	query := `
 		SELECT 
 			(SELECT COUNT(*) FROM likes WHERE ` + likes.NameID + ` = ? AND like = 1) as likes,
@@ -140,11 +156,10 @@ func GetLikes(w http.ResponseWriter, r *http.Request, likes models.GetLikes) (mo
 		return models.GetLikes{}, errors.New("unth")
 	}
 
+	// Set user's like status if they have liked/disliked
 	if userLike.Valid {
 		likes.Like = new(int)
 		*likes.Like = int(userLike.Int64)
 	}
 	return likes, nil
-
-	// utils.RespondWithJSON(w, http.StatusOK, likes)
 }
