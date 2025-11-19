@@ -127,6 +127,7 @@ export const renderAuthForms = () => {
 
 }
 
+// Validates form input against regex pattern and adds/removes error styling
 const validateInput = (id, pattern) => {
     const input = document.getElementById(id)
     const value = input.value.trim();
@@ -138,6 +139,7 @@ const validateInput = (id, pattern) => {
     return value;
 }
 
+// Handles user login, validates credentials, and initializes user session
 const handleLogin = async () => {
     const email = validateInput("login-email", patterns.nickname) ||
         validateInput("login-email", patterns.email);
@@ -215,6 +217,7 @@ const handleSignup = async (e) => {
 }
 
 
+// Checks if user has an active session on page load
 export const checkUserLogin = async () => {
     const response = await fetch('/check-auth');
     const data = await response.json()

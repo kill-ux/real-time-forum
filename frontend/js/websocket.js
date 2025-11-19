@@ -20,6 +20,7 @@ class WebWorkerClient {
 
     }
 
+    // Updates user list with online/offline status before rendering
     PreRenderUsers = ({ members, data }) => {
         members = members.map((member) => {
             member.status = data.includes(member.id) ? 'online' : 'offline';
@@ -28,6 +29,7 @@ class WebWorkerClient {
         renderUsers(members);
     }
 
+    // Routes incoming WebSocket messages to appropriate handlers based on message type
     handleMessage = ({ data }) => {
         switch (data.type) {
             case 'users':

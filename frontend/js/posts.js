@@ -48,6 +48,7 @@ const renderPost = (post) => {
         `;
 }
 
+// Validates and submits new post with title, content, categories, and optional image
 export const addPost = async (e) => {
     e.preventDefault();
 
@@ -134,6 +135,7 @@ export const addCommentsElement = async (id, commentSection, prepend = false) =>
 }
 
 
+// Attaches event listeners for like/dislike, comments toggle, and infinite scroll
 const addPostEvents = (post, postElm) => {
     postElm.querySelector(`.like`).addEventListener("click", (e) => { Utils.like(+postElm.id, 1, "post_id", e.target.parentElement) })
     postElm.querySelector(`.dislike`).addEventListener("click", (e) => { Utils.like(+postElm.id, -1, "post_id", e.target.parentElement) })
